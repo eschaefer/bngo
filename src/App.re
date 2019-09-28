@@ -65,12 +65,6 @@ let initialState = {
 let clientId = "b1cff2065031b0c616f44fc3f972fa0a";
 
 module Decode = {
-  let crazy_artwork = json =>
-    switch (Js.Json.stringifyAny(json)) {
-    | Some(url) => String.length(url) > 5 ? url : ""
-    | None => ""
-    };
-
   let user = json => Json.Decode.{id: json |> field("id", int)};
   let following = json =>
     Json.Decode.{
@@ -83,7 +77,7 @@ module Decode = {
     Json.Decode.{
       id: json |> field("id", int),
       title: json |> field("title", string),
-      artwork_url: json |> optional(field("artwork_url", crazy_artwork)),
+      artwork_url: json |> optional(field("artwork_url", string)),
       stream_url: json |> optional(field("stream_url", string)),
     };
   let userFavorites = json =>
