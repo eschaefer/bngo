@@ -1,4 +1,13 @@
-# reason-hooks
+# bngo
+
+Demonstrates these concepts using ReasonML and React:
+
+- Hooks (`useEffect`, `useReducer`, etc)
+- Refs - (controlling `<audio>` element, dispatching events to it)
+- IntersectionObserver
+- LocalStorage
+- Decoding JSON from a remote API
+- And loads more!
 
 ## Run Project
 
