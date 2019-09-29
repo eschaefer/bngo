@@ -18,6 +18,11 @@ type following = {
 
 type followings = {collection: list(following)};
 
+type userFavorite = {
+  owner: following,
+  favorite,
+};
+
 /* State declaration */
 type state = {
   isPlayerPlaying: bool,
@@ -26,7 +31,7 @@ type state = {
   username: string,
   userId: int,
   followings: list(following),
-  favorites: list(favorite),
+  favorites: list(userFavorite),
   currentTrack: Track.track,
 };
 
@@ -39,7 +44,7 @@ type action =
   | SetUsername(string)
   | SetUserId(int)
   | SetFollowings(list(following))
-  | SetFavorites(list(favorite));
+  | SetFavorites(list(favorite), following);
 
 let initialFavorites =
   switch (Dom.Storage.(localStorage |> getItem(localStorageNamespace))) {
@@ -52,6 +57,7 @@ let initialCurrentTrack: Track.track = {
   title: "",
   artwork_url: "",
   stream_url: "",
+  bumper: "",
 };
 
 let initialState = {
@@ -88,13 +94,16 @@ module Decode = {
     Json.Decode.array(favorite, json) |> Array.to_list;
 };
 
-let trackFromFavorite = (favorite: favorite): Track.track => {
-  title: favorite.title,
-  id: favorite.id,
+let trackFromFavorite = (favorite: userFavorite): Track.track => {
+  title: favorite.favorite.title,
+  id: favorite.favorite.id,
+  bumper: favorite.owner.username,
   artwork_url: {
     // Since sometimes null is a string in the artwork_url, LOL
     let art =
-      Js.Nullable.toOption(Js.Nullable.fromOption(favorite.artwork_url));
+      Js.Nullable.toOption(
+        Js.Nullable.fromOption(favorite.favorite.artwork_url),
+      );
 
     switch (art) {
     | Some(url) => url
@@ -103,23 +112,29 @@ let trackFromFavorite = (favorite: favorite): Track.track => {
   },
 
   stream_url:
-    switch (favorite.stream_url) {
+    switch (favorite.favorite.stream_url) {
     | Some(url) => url
     | None => ""
     },
 };
 
 let getNextTrack = state => {
-  let defaultFav: favorite = {
-    id: 0,
-    title: "",
-    artwork_url: None,
-    stream_url: None,
+  let defaultFav: userFavorite = {
+    owner: {
+      id: 0,
+      username: "",
+    },
+    favorite: {
+      id: 0,
+      title: "",
+      artwork_url: None,
+      stream_url: None,
+    },
   };
 
   let nextTrack =
     Belt.List.reduceWithIndex(state.favorites, 0, (acc, x, i) =>
-      if (state.currentTrack.id == x.id) {
+      if (state.currentTrack.id == x.favorite.id) {
         i + 1;
       } else {
         acc;
@@ -158,7 +173,7 @@ let make = () => {
         | SetUsername(username) => {...state, username}
         | SetUserId(userId) => {...state, userId}
         | SetFollowings(followings) => {...state, followings}
-        | SetFavorites(favorites) => {
+        | SetFavorites(favorites, following) => {
             ...state,
             isLoadingComplete: true,
             favorites:
@@ -171,7 +186,8 @@ let make = () => {
                     | None => false
                     },
                   favorites,
-                ),
+                )
+                |> List.map(favorite => {owner: following, favorite}),
               ),
           }
         },
@@ -247,7 +263,9 @@ let make = () => {
                  )
                  |> then_(Fetch.Response.json)
                  |> then_(json => Decode.userFavorites(json) |> resolve)
-                 |> then_(favs => dispatch(SetFavorites(favs)) |> resolve)
+                 |> then_(favs =>
+                      dispatch(SetFavorites(favs, follower)) |> resolve
+                    )
                )
              )
           |> Js.Promise.all
@@ -301,7 +319,7 @@ let make = () => {
              let track: Track.track = trackFromFavorite(fav);
 
              <Track
-               key={string_of_int(index) ++ string_of_int(fav.id)}
+               key={string_of_int(index) ++ string_of_int(fav.favorite.id)}
                track
                currentTrack={state.currentTrack}
                onTogglePlay={_ => dispatch(TogglePlay)}

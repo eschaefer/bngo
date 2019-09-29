@@ -3,6 +3,7 @@ type track = {
   title: string,
   artwork_url: string,
   stream_url: string,
+  bumper: string,
 };
 
 [@react.component]
@@ -18,6 +19,9 @@ let make = (~onTogglePlay, ~onPlay, ~track, ~currentTrack) => {
     className={"bb " ++ bgColor ++ " pointer dim flex"}
     onClick=onTrackClick>
     <Thumbnail url={isVisible ? track.artwork_url : ""} />
-    <p> {React.string(track.title)} </p>
+    <div>
+      <p> {React.string(track.title)} </p>
+      <p> {React.string("Bumped by " ++ track.bumper)} </p>
+    </div>
   </div>;
 };
