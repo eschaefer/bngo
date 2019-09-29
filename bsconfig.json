@@ -19,7 +19,8 @@
     "reason-react",
     "@glennsl/bs-json",
     "bs-fetch",
-    "bs-react-is-visible"
+    "bs-react-is-visible",
+    "bs-webapi"
   ],
   "refmt": 3
 }

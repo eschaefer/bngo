@@ -2,7 +2,13 @@
 
 [@react.component]
 let make =
-    (~currentTrack: Track.track, ~onTogglePlay, ~isPlayerPlaying, ~clientId) => {
+    (
+      ~currentTrack: Track.track,
+      ~onTogglePlay,
+      ~onPlayNext,
+      ~isPlayerPlaying,
+      ~clientId,
+    ) => {
   let audioRef = React.useRef(Js.Nullable.null);
 
   React.useEffect2(
@@ -21,6 +27,15 @@ let make =
     },
     (isPlayerPlaying, currentTrack.id),
   );
+
+  React.useEffect0(() => {
+    switch (audioRef |> React.Ref.current |> Js.Nullable.toOption) {
+    | Some(el) => Webapi.Dom.Element.addEventListener("ended", onPlayNext, el)
+    | None => ()
+    };
+
+    None;
+  });
 
   let audioUrl =
     currentTrack.id == 0
