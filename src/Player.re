@@ -52,9 +52,7 @@ let make =
       className="bb bg-washed-blue f3 flex z-9999 justify-between pr3"
       style={ReactDOMRe.Style.make(~position="sticky", ~top="0", ())}>
       <div className="flex items-center">
-        <div className="mr3">
-          <Thumbnail url={currentTrack.artwork_url} />
-        </div>
+        <Thumbnail url={currentTrack.artwork_url} />
         <span className=hidden>
           <PlayerControl
             isPlaying=isPlayerPlaying

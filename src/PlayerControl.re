@@ -3,9 +3,10 @@
 
 [@react.component]
 let make = (~isPlaying, ~handleClick) => {
-  <button className="bn outline-0 pointer bg-transparent" onClick=handleClick>
-    {isPlaying
-       ? <img className="w-33" src=pause alt="Pause" />
-       : <img className="w-33" src=play alt="Play" />}
-  </button>;
+  <div className="w3 mh3">
+    <button
+      className="bn outline-0 pointer bg-transparent" onClick=handleClick>
+      {isPlaying ? <img src=pause alt="Pause" /> : <img src=play alt="Play" />}
+    </button>
+  </div>;
 };
