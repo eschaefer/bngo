@@ -56,7 +56,7 @@ let make =
           <Thumbnail url={currentTrack.artwork_url} />
         </div>
         <span className=hidden>
-          <PlayerStatus
+          <PlayerControl
             isPlaying=isPlayerPlaying
             handleClick={_ => currentTrack.id == 0 ? () : onTogglePlay()}
           />

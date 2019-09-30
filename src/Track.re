@@ -22,7 +22,7 @@ let make = (~onTogglePlay, ~onPlay, ~track, ~currentTrack, ~isPlayerPlaying) => 
       <Thumbnail url={isVisible ? track.artwork_url : ""} />
     </div>
     <span className=shownClass>
-      <PlayerStatus
+      <PlayerControl
         isPlaying={isCurrentTrack && isPlayerPlaying}
         handleClick=onTrackClick
       />
