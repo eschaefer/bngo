@@ -64,7 +64,9 @@ let make =
         <p> {ReasonReact.string(currentTrack.title)} </p>
       </div>
       <div className="mw2 mt3 self-start">
-        <a href="/"> <img src=logo alt="Github logo" /> </a>
+        <a href="https://github.com/eschaefer/bngo" title="Edit on Github">
+          <img src=logo alt="Github logo" />
+        </a>
       </div>
     </div>
     <audio ref={ReactDOMRe.Ref.domRef(audioRef)} src=audioUrl />
