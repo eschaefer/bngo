@@ -18,7 +18,7 @@ type following = {
 
 type followings = {collection: list(following)};
 
-type userFavorite = {
+type ownedFavorite = {
   owner: following,
   favorite,
 };
@@ -31,7 +31,7 @@ type state = {
   username: string,
   userId: int,
   followings: list(following),
-  favorites: list(userFavorite),
+  favorites: list(ownedFavorite),
   currentTrack: Track.track,
 };
 
@@ -94,12 +94,12 @@ module Decode = {
     Json.Decode.array(favorite, json) |> Array.to_list;
 };
 
-let trackFromFavorite = (favorite: userFavorite): Track.track => {
+let trackFromFavorite = (favorite: ownedFavorite): Track.track => {
   title: favorite.favorite.title,
   id: favorite.favorite.id,
   bumper: favorite.owner.username,
   artwork_url: {
-    // Since sometimes null is a string in the artwork_url, LOL
+    // Wow
     let art =
       Js.Nullable.toOption(
         Js.Nullable.fromOption(favorite.favorite.artwork_url),
@@ -119,7 +119,7 @@ let trackFromFavorite = (favorite: userFavorite): Track.track => {
 };
 
 let getNextTrack = state => {
-  let defaultFav: userFavorite = {
+  let defaultFav: ownedFavorite = {
     owner: {
       id: 0,
       username: "",
@@ -322,6 +322,7 @@ let make = () => {
                key={string_of_int(index) ++ string_of_int(fav.favorite.id)}
                track
                currentTrack={state.currentTrack}
+               isPlayerPlaying={state.isPlayerPlaying}
                onTogglePlay={_ => dispatch(TogglePlay)}
                onPlay={track => dispatch(Play(track))}
              />;
