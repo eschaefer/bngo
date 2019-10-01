@@ -12,7 +12,7 @@ let make = (~onTogglePlay, ~onPlay, ~track, ~currentTrack, ~isPlayerPlaying) => 
   let isCurrentTrack = currentTrack.id == track.id;
   let onTrackClick = isCurrentTrack ? onTogglePlay : (_ => onPlay(track));
   let bgColor = isCurrentTrack ? "bg-blue" : "bg-dark-pink";
-  let shownClass = isCurrentTrack ? "" : "child dn db-l";
+  let shownClass = isCurrentTrack ? "dn db-l" : "child dn db-l";
 
   <div
     ref
