@@ -49,7 +49,7 @@ let make =
 
   <>
     <div
-      className="bb bg-washed-blue f3 flex z-9999 justify-between pr3"
+      className="bb bg-blue f3 flex z-9999 justify-between pr3"
       style={ReactDOMRe.Style.make(~position="sticky", ~top="0", ())}>
       <div className="flex items-center">
         <Thumbnail url={currentTrack.artwork_url} />
@@ -59,7 +59,9 @@ let make =
             handleClick={_ => currentTrack.id == 0 ? () : onTogglePlay()}
           />
         </span>
-        <p> {ReasonReact.string(currentTrack.title)} </p>
+        <p className="washed-blue b">
+          {ReasonReact.string(currentTrack.title)}
+        </p>
       </div>
       <div className="mw2 mt3 self-start">
         <a href="https://github.com/eschaefer/bngo" title="Edit on Github">

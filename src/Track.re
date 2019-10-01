@@ -11,7 +11,7 @@ let make = (~onTogglePlay, ~onPlay, ~track, ~currentTrack, ~isPlayerPlaying) => 
   let (isVisible, ref) = ReactIsVisible.useIsVisible();
   let isCurrentTrack = currentTrack.id == track.id;
   let onTrackClick = isCurrentTrack ? onTogglePlay : (_ => onPlay(track));
-  let bgColor = isCurrentTrack ? "bg-washed-green" : "bg-washed-yellow";
+  let bgColor = isCurrentTrack ? "bg-blue" : "bg-dark-pink";
   let shownClass = isCurrentTrack ? "" : "child dn db-l";
 
   <div
@@ -32,7 +32,7 @@ let make = (~onTogglePlay, ~onPlay, ~track, ~currentTrack, ~isPlayerPlaying) => 
       />
     </div>
     <div>
-      <p> {React.string(track.title)} </p>
+      <p className="washed-blue b"> {React.string(track.title)} </p>
       <p> {React.string("Bumped by " ++ track.bumper)} </p>
     </div>
   </div>;

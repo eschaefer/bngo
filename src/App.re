@@ -298,6 +298,28 @@ let make = () => {
     (state.isLoadingComplete, state.favorites),
   );
 
+  let trackList =
+    React.array(
+      Belt.List.mapWithIndex(
+        state.favorites,
+        (index, fav) => {
+          // Define this since typings will be wrong if favorite is passed directly to the <Track>
+          let track: Track.track = trackFromFavorite(fav);
+
+          <Track
+            key={string_of_int(index) ++ string_of_int(fav.favorite.id)}
+            track
+            currentTrack={state.currentTrack}
+            isPlayerPlaying={state.isPlayerPlaying}
+            onTogglePlay={_ => dispatch(TogglePlay)}
+            onPlay={track => dispatch(Play(track))}
+          />;
+        },
+      )
+      |> Array.of_list
+      |> Js.Array.slice(~start=0, ~end_=300) // Just cap the list at this number for now
+    );
+
   <>
     <Player
       clientId
@@ -311,26 +333,15 @@ let make = () => {
       handleSubmit={username => dispatch(SetUsername(username))}
     />
     <div>
-      {React.array(
-         Belt.List.mapWithIndex(
-           state.favorites,
-           (index, fav) => {
-             // Define this since typings will be wrong if favorite is passed directly to the <Track>
-             let track: Track.track = trackFromFavorite(fav);
-
-             <Track
-               key={string_of_int(index) ++ string_of_int(fav.favorite.id)}
-               track
-               currentTrack={state.currentTrack}
-               isPlayerPlaying={state.isPlayerPlaying}
-               onTogglePlay={_ => dispatch(TogglePlay)}
-               onPlay={track => dispatch(Play(track))}
-             />;
-           },
-         )
-         |> Array.of_list
-         |> Js.Array.slice(~start=0, ~end_=300) // Just cap the list at this number for now
-       )}
+      {switch (List.length(state.favorites) > 0, state.isLoading) {
+       | (true, true) => trackList
+       | (false, true) => trackList
+       | (true, false) => trackList
+       | (false, false) =>
+         <Defaults
+           setUsername={username => dispatch(SetUsername(username))}
+         />
+       }}
     </div>
   </>;
 };
