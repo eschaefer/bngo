@@ -14,6 +14,7 @@ type user = {id: int};
 type following = {
   id: int,
   username: string,
+  permalink: string,
 };
 
 type followings = {collection: list(following)};
@@ -58,6 +59,7 @@ let initialCurrentTrack: Track.track = {
   artwork_url: "",
   stream_url: "",
   bumper: "",
+  bumperLink: "",
 };
 
 let initialState = {
@@ -79,6 +81,7 @@ module Decode = {
     Json.Decode.{
       id: json |> field("id", int),
       username: json |> field("username", string),
+      permalink: json |> field("permalink", string),
     };
   let followings = json =>
     Json.Decode.{collection: json |> field("collection", list(following))};
@@ -98,6 +101,7 @@ let trackFromFavorite = (favorite: ownedFavorite): Track.track => {
   title: favorite.favorite.title,
   id: favorite.favorite.id,
   bumper: favorite.owner.username,
+  bumperLink: favorite.owner.permalink,
   artwork_url: {
     // Wow
     let art =
@@ -123,6 +127,7 @@ let getNextTrack = state => {
     owner: {
       id: 0,
       username: "",
+      permalink: "",
     },
     favorite: {
       id: 0,
@@ -309,6 +314,7 @@ let make = () => {
           <Track
             key={string_of_int(index) ++ string_of_int(fav.favorite.id)}
             track
+            setUsername={username => dispatch(SetUsername(username))}
             currentTrack={state.currentTrack}
             isPlayerPlaying={state.isPlayerPlaying}
             onTogglePlay={_ => dispatch(TogglePlay)}
@@ -333,14 +339,12 @@ let make = () => {
       handleSubmit={username => dispatch(SetUsername(username))}
     />
     <div>
-      {switch (List.length(state.favorites) > 0, state.isLoading) {
-       | (true, true) => trackList
-       | (false, true) => trackList
-       | (true, false) => trackList
-       | (false, false) =>
+      {if (List.length(state.favorites) === 0 && !state.isLoading) {
          <Defaults
            setUsername={username => dispatch(SetUsername(username))}
-         />
+         />;
+       } else {
+         trackList;
        }}
     </div>
   </>;

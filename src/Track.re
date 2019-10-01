@@ -4,10 +4,19 @@ type track = {
   artwork_url: string,
   stream_url: string,
   bumper: string,
+  bumperLink: string,
 };
 
 [@react.component]
-let make = (~onTogglePlay, ~onPlay, ~track, ~currentTrack, ~isPlayerPlaying) => {
+let make =
+    (
+      ~onTogglePlay,
+      ~setUsername,
+      ~onPlay,
+      ~track,
+      ~currentTrack,
+      ~isPlayerPlaying,
+    ) => {
   let (isVisible, ref) = ReactIsVisible.useIsVisible();
   let isCurrentTrack = currentTrack.id == track.id;
   let onTrackClick = isCurrentTrack ? onTogglePlay : (_ => onPlay(track));
@@ -33,7 +42,18 @@ let make = (~onTogglePlay, ~onPlay, ~track, ~currentTrack, ~isPlayerPlaying) => 
     </div>
     <div>
       <p className="washed-blue b"> {React.string(track.title)} </p>
-      <p> {React.string("Bumped by " ++ track.bumper)} </p>
+      <p>
+        {React.string("Bumped by ")}
+        <a
+          href="#"
+          onClick={event => {
+            ReactEvent.Mouse.preventDefault(event);
+            setUsername(track.bumperLink);
+          }}
+          className="link underline black hover-white pointer">
+          {React.string(track.bumper)}
+        </a>
+      </p>
     </div>
   </div>;
 };
