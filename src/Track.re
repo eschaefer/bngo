@@ -3,6 +3,8 @@ type track = {
   title: string,
   artwork_url: string,
   stream_url: string,
+  duration: int,
+  duration_readable: string,
   bumper: string,
   bumperLink: string,
 };
@@ -54,6 +56,7 @@ let make =
           {React.string(track.bumper)}
         </a>
       </p>
+      <p className="f6"> {ReasonReact.string(track.duration_readable)} </p>
     </div>
   </div>;
 };

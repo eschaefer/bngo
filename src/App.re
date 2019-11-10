@@ -7,6 +7,8 @@ type favorite = {
   title: string,
   artwork_url: option(string),
   stream_url: option(string),
+  streamable: bool,
+  duration: int,
 };
 
 type user = {id: int};
@@ -60,6 +62,8 @@ let initialCurrentTrack: Track.track = {
   stream_url: "",
   bumper: "",
   bumperLink: "",
+  duration: 0,
+  duration_readable: "",
 };
 
 let initialState = {
@@ -74,6 +78,25 @@ let initialState = {
 };
 
 let clientId = "b1cff2065031b0c616f44fc3f972fa0a";
+
+let padStart = value =>
+  if (value < 10) {
+    "0" ++ string_of_int(value);
+  } else {
+    string_of_int(value);
+  };
+
+let durationConverter = secs => {
+  let minutes = secs mod 3600 / 60 |> padStart;
+  let seconds = secs mod 60 |> padStart;
+  let hours = secs / 3600;
+
+  if (hours < 1) {
+    minutes ++ ":" ++ seconds;
+  } else {
+    string_of_int(hours) ++ ":" ++ minutes ++ ":" ++ seconds;
+  };
+};
 
 module Decode = {
   let user = json => Json.Decode.{id: json |> field("id", int)};
@@ -91,6 +114,8 @@ module Decode = {
       title: json |> field("title", string),
       artwork_url: json |> optional(field("artwork_url", string)),
       stream_url: json |> optional(field("stream_url", string)),
+      streamable: json |> field("streamable", bool),
+      duration: json |> field("duration", int),
     };
 
   let userFavorites = json =>
@@ -102,6 +127,8 @@ let trackFromFavorite = (favorite: ownedFavorite): Track.track => {
   id: favorite.favorite.id,
   bumper: favorite.owner.username,
   bumperLink: favorite.owner.permalink,
+  duration: favorite.favorite.duration / 1000,
+  duration_readable: durationConverter(favorite.favorite.duration / 1000),
   artwork_url: {
     // Wow
     let art =
@@ -134,6 +161,8 @@ let getNextTrack = state => {
       title: "",
       artwork_url: None,
       stream_url: None,
+      streamable: true,
+      duration: 0,
     },
   };
 
@@ -186,9 +215,10 @@ let make = () => {
                 state.favorites,
                 List.filter(
                   favorite =>
-                    switch (favorite.stream_url) {
-                    | Some(url) => String.length(url) > 0
-                    | None => false
+                    switch (favorite.stream_url, favorite.streamable) {
+                    | (Some(url), true) => String.length(url) > 0
+                    | (Some(_), false) => false
+                    | (None, _) => false
                     },
                   favorites,
                 )

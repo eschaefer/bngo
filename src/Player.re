@@ -10,6 +10,16 @@ let make =
       ~clientId,
     ) => {
   let audioRef = React.useRef(Js.Nullable.null);
+  let (progress, setProgress) = React.useState(() => 0);
+
+  React.useEffect1(
+    () => {
+      setProgress(_ => 0);
+
+      None;
+    },
+    [|currentTrack.id|],
+  );
 
   React.useEffect2(
     () => {
@@ -47,6 +57,24 @@ let make =
 
   let hidden = currentTrack.id == 0 ? "dn " : "";
 
+  let handleInput = event => {
+    let time = ReactEvent.Form.target(event)##value;
+
+    switch (audioRef |> React.Ref.current |> Js.Nullable.toOption) {
+    | Some(element) =>
+      ReactDOMRe.domElementToObj(element)##currentTime #= time
+    | None => ()
+    };
+  };
+
+  let updateControl = event => {
+    let time = ReactEvent.Media.target(event)##currentTime;
+
+    if (time - progress > 1) {
+      setProgress(time);
+    };
+  };
+
   <>
     <div
       className="bb bg-blue f3 flex z-9999 justify-between pr3"
@@ -59,9 +87,24 @@ let make =
             handleClick={_ => currentTrack.id == 0 ? () : onTogglePlay()}
           />
         </span>
-        <p className="washed-blue b">
-          {ReasonReact.string(currentTrack.title)}
-        </p>
+        <div>
+          <p className="washed-blue b">
+            {ReasonReact.string(currentTrack.title)}
+          </p>
+          <input
+            onInput=handleInput
+            type_="range"
+            id="playing"
+            onChange={_ => ()}
+            value={string_of_int(progress)}
+            name="timestamp"
+            min=0
+            max={string_of_int(currentTrack.duration)}
+          />
+          <p className="f6 mt0 mb0">
+            {ReasonReact.string(currentTrack.duration_readable)}
+          </p>
+        </div>
       </div>
       <div className="mw2 mt3 self-start">
         <a href="https://github.com/eschaefer/bngo" title="Edit on Github">
@@ -69,6 +112,10 @@ let make =
         </a>
       </div>
     </div>
-    <audio ref={ReactDOMRe.Ref.domRef(audioRef)} src=audioUrl />
+    <audio
+      onTimeUpdate=updateControl
+      ref={ReactDOMRe.Ref.domRef(audioRef)}
+      src=audioUrl
+    />
   </>;
 };
