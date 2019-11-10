@@ -88,7 +88,7 @@ let make =
           />
         </span>
         <div>
-          <p className="washed-blue b">
+          <p className="washed-blue b mt0 mb0">
             {ReasonReact.string(currentTrack.title)}
           </p>
           <input
